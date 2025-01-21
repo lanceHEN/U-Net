@@ -1,0 +1,6 @@
+torch
+Pillow
+torchvision
+scikit-learn
+Numpy
+tensorboard
