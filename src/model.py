@@ -1,15 +1,16 @@
 import torch
 import torch.nn as nn
 
+# model from https://arxiv.org/pdf/1505.04597 with layernorms added
 class UNet(nn.Module):
 
     def __init__(self, num_classes):
         super().__init__()
 
-        d = 256
+        d = 256 # however tall and wide the image is
 
-        d -= 2
-        embd = 64
+        d -= 2 # have to subtract to keep up with dimension loss through convolutions
+        embd = 64 # number of embeddings to start with (as used in the paper)
 
         # encoder
         # encoder level 1
@@ -214,6 +215,7 @@ class UNet(nn.Module):
         # final conv for output segmentation
         self.final_conv = nn.Conv2d(64, num_classes, kernel_size=1)
 
+    # for cropping the feature map from the encoder path to work with the decoder dimensions
     def crop(self, enc_out, dec_in):
         _, _, h_dec, w_dec = dec_in.size()
         _, _, h_enc, w_enc = enc_out.size()
@@ -235,8 +237,7 @@ class UNet(nn.Module):
 
         e4_out = self.e42(self.e41(self.mp3(e3_out)))
 
-        out =  self.mp4(e4_out)
-        e5_out = self.e52(self.e51(out))
+        e5_out = self.e52(self.e51(self.mp4(e4_out)))
 
         # decoder
         up4_out = self.up4(e5_out)
