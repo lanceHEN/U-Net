@@ -4,10 +4,8 @@ import torch.nn as nn
 # model from https://arxiv.org/pdf/1505.04597 with layernorms added
 class UNet(nn.Module):
 
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, d=256):
         super().__init__()
-
-        d = 256 # however tall and wide the image is
 
         d -= 2 # have to subtract to keep up with dimension loss through convolutions
         embd = 64 # number of embeddings to start with (as used in the paper)
