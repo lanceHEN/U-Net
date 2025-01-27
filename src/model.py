@@ -4,12 +4,10 @@ import torch.nn as nn
 # model from https://arxiv.org/pdf/1505.04597 with layernorms added
 class UNet(nn.Module):
 
-    def __init__(self, num_classes):
-        super().__init__()
+    def __init__(self, num_classes, image_dim):
+        super(UNet).__init__()
 
-        d = 256 # however tall and wide the image is
-
-        d -= 2 # have to subtract to keep up with dimension loss through convolutions
+        image_dim -= 2 # have to subtract to keep up with dimension loss through convolutions
         embd = 64 # number of embeddings to start with (as used in the paper)
 
         # encoder
@@ -17,198 +15,202 @@ class UNet(nn.Module):
         self.e11 = nn.Sequential(
             # 3 channels for rgb
             nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.e12 = nn.Sequential(
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
         # max pool 1
         self.mp1 = nn.MaxPool2d(kernel_size=2, stride=2)
-        d //= 2
-        d -= 2
+        image_dim //= 2
+        image_dim -= 2
         embd *= 2
 
         # encoder level 2
         self.e21 = nn.Sequential(
             nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
         self.e22 = nn.Sequential(
             nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
         # max pool 2
         self.mp2 = nn.MaxPool2d(kernel_size=2, stride=2)
-        d //= 2
-        d -= 2
+        image_dim //= 2
+        image_dim -= 2
         embd *= 2
 
         # encoder level 3
         self.e31 = nn.Sequential(
             nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.e32 = nn.Sequential(
             nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
         # max pool 3
         self.mp3 = nn.MaxPool2d(kernel_size=2, stride=2)
-        d //= 2
-        d -= 2
+        image_dim //= 2
+        image_dim -= 2
         embd *= 2
 
         # encoder level 4
         self.e41 = nn.Sequential(
             nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.e42 = nn.Sequential(
             nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
         # max pool 4
         self.mp4 = nn.MaxPool2d(kernel_size=2, stride=2)
-        d //= 2
-        d -= 2
+        image_dim //= 2
+        image_dim -= 2
         embd *= 2
 
         # encoder level 5
         self.e51 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.e52 = nn.Sequential(
             nn.Conv2d(1024, 1024, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d*=2
+        image_dim*=2
         embd //= 2
 
         # up conv 4
         self.up4 = nn.Sequential(
             nn.ConvTranspose2d(1024, 512, kernel_size=2, stride=2),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
         )
 
-        d -= 2
+        image_dim -= 2
 
         # decoder level 4
         self.d41 = nn.Sequential(
             nn.Conv2d(1024, 512, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.d42 = nn.Sequential(
             nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d *= 2
+        image_dim *= 2
         embd //= 2
 
         # up conv 3
         self.up3 = nn.Sequential(
             nn.ConvTranspose2d(512, 256, kernel_size=2, stride=2),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
         )
 
-        d -= 2
+        image_dim -= 2
 
         # decoder level 3
         self.d31 = nn.Sequential(
             nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.d32 = nn.Sequential(
             nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=0),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d *= 2
+        image_dim *= 2
         embd //= 2
 
         # up conv 2
         self.up2 = nn.Sequential(
             nn.ConvTranspose2d(256, 128, kernel_size=2, stride=2),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
         )
 
-        d -= 2
+        image_dim -= 2
 
         # decoder level 2
         self.d21 = nn.Sequential(
             nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=0),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.d22 = nn.Sequential(
             nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=0),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d *= 2
+        image_dim *= 2
         embd //= 2
 
         # up conv 1
         self.up1 = nn.Sequential(
             nn.ConvTranspose2d(128, 64, kernel_size=2, stride=2),
-            nn.LayerNorm([embd,d,d]),
+            nn.LayerNorm([embd,image_dim,image_dim]),
         )
 
-        d -= 2
+        image_dim -= 2
 
         # decoder level `
         self.d11 = nn.Sequential(
             nn.Conv2d(128, 64, kernel_size=3, stride=1, padding=0),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
-        d -= 2
+        image_dim -= 2
 
         self.d12 = nn.Sequential(
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=0),
+            nn.LayerNorm([embd,image_dim,image_dim]),
             nn.ReLU(inplace=True),
         )
 
