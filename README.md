@@ -102,7 +102,7 @@ Input images fed to the U-Net model (made BW to reduce triggers).
 Predicted segmentation masks.
 ![original](demonstration/predictions.png)
 
-Ground truth segmentation mask.
+Ground truth segmentation masks.
 ![original](demonstration/masks.png)
 
 Final results will include quantitative metrics (e.g., IoU, Dice coefficient) and qualitative visualizations of predictions.
