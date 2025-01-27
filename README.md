@@ -1,4 +1,4 @@
-# U-Net Skin Lesion Segmentation
+# U-Net for Skin Lesion Segmentation
 
 This project implements a U-Net model, enhanced with layer normalization, for the task of skin lesion segmentation. The project includes the model definition in PyTorch and a training notebook for dataset preparation, model training, and evaluation.
 
