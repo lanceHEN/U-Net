@@ -97,12 +97,13 @@ Below are examples of input images, predicted masks, and ground truth masks:
 
 
 Input images fed to the U-Net model (made BW to reduce triggers).
-![original](/demonstrations/original.png)
+![original](demonstration/original.png)
 
 Predicted segmentation masks.
-
+![original](demonstration/predictions.png)
 
 Ground truth segmentation mask.
+![original](demonstration/masks.png)
 
 Final results will include quantitative metrics (e.g., IoU, Dice coefficient) and qualitative visualizations of predictions.
 
