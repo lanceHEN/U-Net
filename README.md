@@ -91,6 +91,21 @@ During training, you can monitor:
 - **Validation accuracy**
 - **Predicted masks**
 
+Example Visualizations
+
+Below are examples of input images, predicted masks, and ground truth masks:
+
+
+Input images fed to the U-Net model (made BW to reduce triggers).
+![original](/demonstrations/original.png)
+
+Predicted segmentation masks.
+
+
+Ground truth segmentation mask.
+
+Final results will include quantitative metrics (e.g., IoU, Dice coefficient) and qualitative visualizations of predictions.
+
 ---
 
 ## Acknowledgments
